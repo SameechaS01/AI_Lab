@@ -1,90 +1,94 @@
-import os    
-import time    
+import os
+#This function is used to draw the board's current state every time the user turn arrives. 
+def ConstBoard(board):
+    print("Current State Of Board : \n\n");
+    for i in range (0,9):
+        if((i>0) and (i%3)==0):
+            print("\n");
+        if(board[i]==0):
+            print("- ",end=" ");
+        if (board[i]==1):
+            print("O ",end=" ");
+        if(board[i]==-1):    
+            print("X ",end=" ");
+    print("\n\n");
+#This function takes the user move as input and make the required changes on the board.
+def User1Turn(board):
+    pos=input("Enter X's position from [1...9]: ");
+    pos=int(pos);
+    if(board[pos-1]!=0):
+        print("Wrong Move!!!");
+        exit(0) ;
+    board[pos-1]=-1;
+#MinMax function.
+def minimax(board,player):
+    x=analyzeboard(board);
+    if(x!=0):
+        return (x*player);
+    pos=-1;
+    value=-2;
+    for i in range(0,9):
+        if(board[i]==0):
+            board[i]=player;
+            score=-minimax(board,(player*-1));
+            if(score>value):
+                value=score;
+                pos=i;
+            board[i]=0;
+
+    if(pos==-1):
+        return 0;
+    return value;
+#This function makes the computer's move using minmax algorithm.
+def CompTurn(board):
+    pos=-1;
+    value=-2;
+    for i in range(0,9):
+        if(board[i]==0):
+            board[i]=1;
+            score=-minimax(board, -1);
+            board[i]=0;
+            if(score>value):
+                value=score;
+                pos=i;
+ 
+    board[pos]=1;
+#This function is used to analyze a game.
+def analyzeboard(board):
+    cb=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+    for i in range(0,8):
+        if(board[cb[i][0]] != 0 and
+           board[cb[i][0]] == board[cb[i][1]] and
+           board[cb[i][0]] == board[cb[i][2]]):
+            return board[cb[i][2]];
+    return 0;
+#Main Function.
+def main():
     
-board = [' ',' ',' ',' ',' ',' ',' ',' ',' ',' ']    
-player = 1    
-   
-########win Flags##########    
-Win = 1    
-Draw = -1    
-Running = 0    
-Stop = 1    
-###########################    
-Game = Running    
-Mark = 'X'    
-   
-#This Function Draws Game Board    
-def DrawBoard():    
-    print(" %c | %c | %c " % (board[1],board[2],board[3]))    
-    print("___|___|___")    
-    print(" %c | %c | %c " % (board[4],board[5],board[6]))    
-    print("___|___|___")    
-    print(" %c | %c | %c " % (board[7],board[8],board[9]))    
-    print("   |   |   ")    
-   
-#This Function Checks position is empty or not    
-def CheckPosition(x):    
-    if(board[x] == ' '):    
-        return True    
-    else:    
-        return False    
-   
-#This Function Checks player has won or not    
-def CheckWin():    
-    global Game    
-    #Horizontal winning condition    
-    if(board[1] == board[2] and board[2] == board[3] and board[1] != ' '):    
-        Game = Win    
-    elif(board[4] == board[5] and board[5] == board[6] and board[4] != ' '):    
-        Game = Win    
-    elif(board[7] == board[8] and board[8] == board[9] and board[7] != ' '):    
-        Game = Win    
-    #Vertical Winning Condition    
-    elif(board[1] == board[4] and board[4] == board[7] and board[1] != ' '):    
-        Game = Win    
-    elif(board[2] == board[5] and board[5] == board[8] and board[2] != ' '):    
-        Game = Win    
-    elif(board[3] == board[6] and board[6] == board[9] and board[3] != ' '):    
-        Game=Win    
-    #Diagonal Winning Condition    
-    elif(board[1] == board[5] and board[5] == board[9] and board[5] != ' '):    
-        Game = Win    
-    elif(board[3] == board[5] and board[5] == board[7] and board[5] != ' '):    
-        Game=Win    
-    #Match Tie or Draw Condition    
-    elif(board[1]!=' ' and board[2]!=' ' and board[3]!=' ' and board[4]!=' ' and board[5]!=' ' and board[6]!=' ' and board[7]!=' ' and board[8]!=' ' and board[9]!=' '):    
-        Game=Draw    
-    else:            
-        Game=Running    
+    os.system('cls')
+    board=[0,0,0,0,0,0,0,0,0];
+    print("Computer : O Vs. You : X");
+    player= input("Enter to play 1(st) or 2(nd) :");
+    player = int(player);
+    for i in range (0,9):
+        if(analyzeboard(board)!=0):
+            break;
+        if((i+player)%2==0):
+            CompTurn(board);
+        else:
+            ConstBoard(board);
+            User1Turn(board);
     
-print("Tic-Tac-Toe Game Designed By Sourabh Somani")    
-print("Player 1 [X] --- Player 2 [O]\n")    
-print()    
-print()    
-print("Please Wait...")    
-time.sleep(3)    
-while(Game == Running):    
-    os.system('cls')    
-    DrawBoard()    
-    if(player % 2 != 0):    
-        print("Player 1's chance")    
-        Mark = 'X'    
-    else:    
-        print("Player 2's chance")    
-        Mark = 'O'    
-    choice = int(input("Enter the position between [1-9] where you want to mark : "))    
-    if(CheckPosition(choice)):    
-        board[choice] = Mark    
-        player+=1    
-        CheckWin()    
-    
-os.system('cls')    
-DrawBoard()    
-if(Game==Draw):    
-    print("Game Draw")    
-elif(Game==Win):    
-    player-=1    
-    if(player%2!=0):    
-        print("Player 1 Won")    
-    else:    
-        print("Player 2 Won")  
+    x=analyzeboard(board);
+    if(x==0):
+         ConstBoard(board);1
+         print("Draw!!!")
+    if(x==-1):
+         ConstBoard(board);
+         print("X Wins!!! Y Loose !!!")
+    if(x==1):
+         ConstBoard(board);
+         print("X Loose!!! O Wins !!!!")
+       
+main()
